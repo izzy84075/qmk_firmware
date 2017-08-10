@@ -15,6 +15,7 @@
  */
 #include "daskeyboard3.h"
 #include "printf.h"
+#include "debug.h"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = KEYMAP(
@@ -40,6 +41,11 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt) {
             palSetPad(GPIOA, 3);
             palSetPad(GPIOA, 15);
             palSetPad(GPIOB, 5);*/
+			
+			debug_enable = true;
+			debug_matrix = true;
+			debug_keyboard = true;
+			
             break;
         case 1:
             print("Turning backlight on.\n");

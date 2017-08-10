@@ -1,9 +1,12 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
+
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
+
         http://www.apache.org/licenses/LICENSE-2.0
+
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -102,10 +105,6 @@
  */
 #define CH_CFG_NO_IDLE_THREAD               FALSE
 
-/* Use __WFI in the idle thread for waiting. Does lower the power
- * consumption. */
-#define CORTEX_ENABLE_WFI_IDLE              TRUE
-
 /** @} */
 
 /*===========================================================================*/
@@ -141,7 +140,7 @@
  *
  * @note    The default is @p TRUE.
  */
-#define CH_CFG_USE_TM                       FALSE
+#define CH_CFG_USE_TM                       TRUE
 
 /**
  * @brief   Threads registry APIs.

@@ -7,6 +7,7 @@
 #include "printf.h"
 #include "backlight.h"
 #include "matrix.h"
+#include "debug.h"
 
 
 /* Clueboard4
@@ -30,46 +31,50 @@ void matrix_init(void) {
     //debug_matrix = true;
 
     /* Column(sense) */
-	palSetPadMode(GPIOB, 0,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 1,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 2,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 3,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 4,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 5,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 6,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 7,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 8,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 9,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 10,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 11,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 12,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 13,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 14,  PAL_MODE_INPUT_PULLDOWN);
-	palSetPadMode(GPIOB, 15,  PAL_MODE_INPUT_PULLDOWN);
-    palSetPadMode(GPIOA, 0,  PAL_MODE_INPUT_PULLDOWN);
-    palSetPadMode(GPIOA, 1,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 0,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 1,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 2,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 3,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 4,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 5,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 6,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 7,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 8,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 9,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 10,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 11,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 12,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 13,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 14,  PAL_MODE_INPUT_PULLDOWN);
+	palSetPadMode(GPIOD, 15,  PAL_MODE_INPUT_PULLDOWN);
+    palSetPadMode(GPIOC, 0,  PAL_MODE_INPUT_PULLDOWN);
+    palSetPadMode(GPIOC, 1,  PAL_MODE_INPUT_PULLDOWN);
 
     /* Row(strobe) */
-	palSetPadMode(GPIOA, 2,  PAL_MODE_OUTPUT_PUSHPULL);
-	palSetPadMode(GPIOA, 3,  PAL_MODE_OUTPUT_PUSHPULL);
-	palSetPadMode(GPIOA, 4,  PAL_MODE_OUTPUT_PUSHPULL);
-	palSetPadMode(GPIOA, 5,  PAL_MODE_OUTPUT_PUSHPULL);
-	palSetPadMode(GPIOA, 6,  PAL_MODE_OUTPUT_PUSHPULL);
-	palSetPadMode(GPIOA, 7,  PAL_MODE_OUTPUT_PUSHPULL);
-	palSetPadMode(GPIOA, 8,  PAL_MODE_OUTPUT_PUSHPULL);
-	palSetPadMode(GPIOA, 9,  PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOC, 2,  PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOC, 3,  PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOC, 4,  PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOC, 5,  PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOC, 6,  PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOC, 7,  PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOC, 8,  PAL_MODE_OUTPUT_PUSHPULL);
+	palSetPadMode(GPIOC, 9,  PAL_MODE_OUTPUT_PUSHPULL);
 	
-	palClearPad(GPIOA, 2);
-	palClearPad(GPIOA, 3);
-	palClearPad(GPIOA, 4);
-	palClearPad(GPIOA, 5);
-	palClearPad(GPIOA, 6);
-	palClearPad(GPIOA, 7);
-	palClearPad(GPIOA, 8);
-	palClearPad(GPIOA, 9);
+	palClearPad(GPIOC, 2);
+	palClearPad(GPIOC, 3);
+	palClearPad(GPIOC, 4);
+	palClearPad(GPIOC, 5);
+	palClearPad(GPIOC, 6);
+	palClearPad(GPIOC, 7);
+	palClearPad(GPIOC, 8);
+	palClearPad(GPIOC, 9);
 
     memset(matrix, 0, MATRIX_ROWS);
     memset(matrix_debouncing, 0, MATRIX_ROWS);
+	
+	debug_enable = true;
+	debug_matrix = true;
+	debug_keyboard = true;
 }
 
 uint8_t matrix_scan(void) {
@@ -78,29 +83,30 @@ uint8_t matrix_scan(void) {
     // read col data: { PA5, PA4, PB6, PB3 }
 	for(int row = 0; row < MATRIX_ROWS;row++) {
 		switch(row) {
-			case 0: palSetPad(GPIOA, 2); break;
-			case 1: palSetPad(GPIOA, 3); break;
-			case 2: palSetPad(GPIOA, 4); break;
-			case 3: palSetPad(GPIOA, 5); break;
-			case 4: palSetPad(GPIOA, 6); break;
-			case 5: palSetPad(GPIOA, 7); break;
-			case 6: palSetPad(GPIOA, 8); break;
-			case 7: palSetPad(GPIOA, 9); break;
+			case 0: palSetPad(GPIOC, 2); break;
+			case 1: palSetPad(GPIOC, 3); break;
+			case 2: palSetPad(GPIOC, 4); break;
+			case 3: palSetPad(GPIOC, 5); break;
+			case 4: palSetPad(GPIOC, 6); break;
+			case 5: palSetPad(GPIOC, 7); break;
+			case 6: palSetPad(GPIOC, 8); break;
+			case 7: palSetPad(GPIOC, 9); break;
 		}
 		
 		wait_us(20);
 		
-		data = (palReadPort(GPIOB) | ((palReadPort(GPIOA) & 0x0003) << 16));
+		data = ((matrix_row_t)(palReadPort(GPIOD)) | (((matrix_row_t)(palReadPort(GPIOC)) & 0x0003) << 16));
+		//data = palReadPort(GPIOB);
 	
 		switch(row) {
-			case 0: palClearPad(GPIOA, 2); break;
-			case 1: palClearPad(GPIOA, 3); break;
-			case 2: palClearPad(GPIOA, 4); break;
-			case 3: palClearPad(GPIOA, 5); break;
-			case 4: palClearPad(GPIOA, 6); break;
-			case 5: palClearPad(GPIOA, 7); break;
-			case 6: palClearPad(GPIOA, 8); break;
-			case 7: palClearPad(GPIOA, 9); break;
+			case 0: palClearPad(GPIOC, 2); break;
+			case 1: palClearPad(GPIOC, 3); break;
+			case 2: palClearPad(GPIOC, 4); break;
+			case 3: palClearPad(GPIOC, 5); break;
+			case 4: palClearPad(GPIOC, 6); break;
+			case 5: palClearPad(GPIOC, 7); break;
+			case 6: palClearPad(GPIOC, 8); break;
+			case 7: palClearPad(GPIOC, 9); break;
 		}
 		
 		if (matrix_debouncing[row] != data) {
@@ -117,6 +123,8 @@ uint8_t matrix_scan(void) {
 		debouncing = false;
     }
 
+	//matrix_print();
+	
     return 1;
 }
 
@@ -129,7 +137,7 @@ matrix_row_t matrix_get_row(uint8_t row) {
 }
 
 void matrix_print(void) {
-    printf("\nr/c 01234567\n");
+    printf("\nr/c 0123456789abcdef\n");
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
         printf("%X0: ", row);
         matrix_row_t data = matrix_get_row(row);

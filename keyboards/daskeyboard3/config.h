@@ -22,17 +22,17 @@
 
 /* USB Device descriptor parameter */
 #define VENDOR_ID       0xC1ED
-#define PRODUCT_ID      0x2340
+#define PRODUCT_ID      0x2350
 #define DEVICE_VER      0x0001
-#define MANUFACTURER    "Izzy"
-#define USBSTR_MANUFACTURER 'I', '\x00', 'z', '\x00', 'z', '\x00', 'y', '\x00'
-#define PRODUCT         "DasKeyboard3"
-#define USBSTR_PRODUCT      'D', '\x00', 'a', '\x00', 's', '\x00', 'K', '\x00', 'e', '\x00', 'y', '\x00', 'b', '\x00', 'o', '\x00', 'a', '\x00', 'r', '\x00', 'd', '\x00', '3', '\x00'
-#define DESCRIPTION     A switch tester that plays Simon
+#define MANUFACTURER    "Das Keyboard"
+#define USBSTR_MANUFACTURER 'D', '\x00', 'a', '\x00', 's', '\x00', ' ', '\x00', 'K', '\x00', 'e', '\x00', 'y', '\x00', 'b', '\x00', 'o', '\x00', 'a', '\x00', 'r', '\x00', 'd', '\x00'
+#define PRODUCT         "Das Keyboard 3"
+#define USBSTR_PRODUCT 'D', '\x00', 'a', '\x00', 's', '\x00', ' ', '\x00', 'K', '\x00', 'e', '\x00', 'y', '\x00', 'b', '\x00', 'o', '\x00', 'a', '\x00', 'r', '\x00', 'd', '\x00', ' ', '\x00', '3', '\x00'
+#define DESCRIPTION     "Das Keyboard 3"
 
 /* key matrix size */
-#define MATRIX_ROWS 18
-#define MATRIX_COLS 8
+#define MATRIX_ROWS 8
+#define MATRIX_COLS 18
 
 /*
  * Keyboard Matrix Assignments
@@ -45,14 +45,11 @@
  *
 */
 /* Note: These are not used for arm boards. They're here purely as documentation.
- * #define MATRIX_ROW_PINS { PA7 }
- * #define MATRIX_COL_PINS { PA5, PA4, PB6, PB3 }
+ * #define MATRIX_ROW_PINS { PB0, PB1, PB2, PA15, PA10 }
+ * #define MATRIX_COL_PINS { PA2, PA3, PA6, PB14, PB15, PA8, PA9, PA7, PB3, PB4, PC14, PC15, PC13, PB5, PB6 }
  * #define UNUSED_PINS
  */
 
-/* COL2ROW, ROW2COL, or CUSTOM_MATRIX */
-#define DIODE_DIRECTION CUSTOM_MATRIX
- 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE 6
 
@@ -134,6 +131,6 @@
  *
  *     STM32F042x6
  */
-#define STM32_REMAP_PINS
+// #define STM32_REMAP_PINS
 
 #endif
