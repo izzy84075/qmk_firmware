@@ -96,7 +96,7 @@ uint8_t matrix_scan(void) {
 		wait_us(20);
 		
 		data = ((matrix_row_t)(palReadPort(GPIOD)) | (((matrix_row_t)(palReadPort(GPIOC)) & 0x0003) << 16));
-		//data = palReadPort(GPIOB);
+		//data = palReadPort(GPIOD);
 	
 		switch(row) {
 			case 0: palClearPad(GPIOC, 2); break;
