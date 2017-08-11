@@ -25,6 +25,21 @@ static matrix_row_t matrix_debouncing[MATRIX_ROWS];
 static bool debouncing = false;
 static uint16_t debouncing_time = 0;
 
+__attribute__ ((weak))
+void matrix_init_user(void) {}
+
+__attribute__ ((weak))
+void matrix_scan_user(void) {}
+
+__attribute__ ((weak))
+void matrix_init_kb(void) {
+  matrix_init_user();
+}
+
+__attribute__ ((weak))
+void matrix_scan_kb(void) {
+  matrix_scan_user();
+}
 
 void matrix_init(void) {
     printf("matrix init\n");
@@ -75,6 +90,8 @@ void matrix_init(void) {
 	debug_enable = true;
 	debug_matrix = true;
 	debug_keyboard = true;
+	
+	matrix_init_quantum();
 }
 
 uint8_t matrix_scan(void) {
@@ -123,7 +140,7 @@ uint8_t matrix_scan(void) {
 		debouncing = false;
     }
 
-	//matrix_print();
+	matrix_scan_quantum();
 	
     return 1;
 }
