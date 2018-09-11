@@ -1201,8 +1201,8 @@ static inline uint16_t scale_backlight(uint16_t v) {
  */
 ISR(TIMER1_OVF_vect)
 {
-  uint16_t interval = momentum_enabled()
-    ? match_momentum(1, 10)
+  uint16_t interval = velocikey_enabled()
+    ? velocikey_match_speed(1, 10)
     : (uint16_t) breathing_period * 244 / BREATHING_STEPS;
 
   // resetting after one period to prevent ugly reset at overflow.
