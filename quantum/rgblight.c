@@ -24,7 +24,7 @@
 #include "rgblight.h"
 #include "debug.h"
 #include "led_tables.h"
-#include "momentum.h"
+#include "velocikey.h"
 
 #ifndef RGBLIGHT_LIMIT_VAL
 #define RGBLIGHT_LIMIT_VAL 255
@@ -248,7 +248,7 @@ void rgblight_mode_eeprom_helper(uint8_t mode, bool write_to_eeprom) {
       rgblight_timer_disable();
     #endif
   } else if ((rgblight_config.mode >= 2 && rgblight_config.mode <= 24) ||
-	     rgblight_config.mode == 35 ) {
+	     rgblight_config.mode == 35 || rgblight_config.mode == 36) {
     // MODE 2-5, breathing
     // MODE 6-8, rainbow mood
     // MODE 9-14, rainbow swirl
@@ -256,6 +256,7 @@ void rgblight_mode_eeprom_helper(uint8_t mode, bool write_to_eeprom) {
     // MODE 21-23, knight
     // MODE 24, xmas
     // MODE 35  RGB test
+    // MODE 36, alterating
 
     #ifdef RGBLIGHT_ANIMATIONS
       rgblight_timer_enable();
@@ -593,6 +594,8 @@ void rgblight_task(void) {
     } else if (rgblight_config.mode == 35) {
       // mode = 35, RGB test
       rgblight_effect_rgbtest();
+    } else if (rgblight_config.mode == 36){
+      rgblight_effect_alternating();
     }
   }
 }
@@ -603,9 +606,11 @@ void rgblight_effect_breathing(uint8_t interval) {
   static uint16_t last_timer = 0;
   float val;
 
-  uint8_t interval_time = momentum_enabled()
-    ? match_momentum(1, 100) 
-    : pgm_read_byte(&RGBLED_RAINBOW_SWIRL_INTERVALS[interval / 2]);
+  uint8_t interval_time = 
+#ifdef VELOCIKEY_ENABLE
+    velocikey_enabled() ? velocikey_match_speed(1, 100) :
+#endif
+    pgm_read_byte(&RGBLED_RAINBOW_SWIRL_INTERVALS[interval / 2]);
   
   if (timer_elapsed(last_timer) < interval_time) {
     return;
@@ -622,9 +627,11 @@ void rgblight_effect_rainbow_mood(uint8_t interval) {
   static uint16_t current_hue = 0;
   static uint16_t last_timer = 0;
 
-  uint8_t interval_time = momentum_enabled()
-    ? match_momentum(5, 100)
-    : pgm_read_byte(&RGBLED_RAINBOW_MOOD_INTERVALS[interval]);
+  uint8_t interval_time = 
+#ifdef VELOCIKEY_ENABLE
+    velocikey_enabled() ? velocikey_match_speed(5, 100) :
+#endif
+    pgm_read_byte(&RGBLED_RAINBOW_MOOD_INTERVALS[interval]);
 
   if (timer_elapsed(last_timer) < interval_time) {
     return;
@@ -639,9 +646,11 @@ void rgblight_effect_rainbow_swirl(uint8_t interval) {
   uint16_t hue;
   uint8_t i;
 
-  uint8_t interval_time = momentum_enabled()
-    ? match_momentum(1, 100)
-    : pgm_read_byte(&RGBLED_RAINBOW_SWIRL_INTERVALS[interval / 2]);
+  uint8_t interval_time = 
+#ifdef VELOCIKEY_ENABLE
+    velocikey_enabled() ? velocikey_match_speed(1, 100) : 
+#endif
+    pgm_read_byte(&RGBLED_RAINBOW_SWIRL_INTERVALS[interval / 2]);
 
   if (timer_elapsed(last_timer) < interval_time) {
     return;
@@ -673,9 +682,11 @@ void rgblight_effect_snake(uint8_t interval) {
     increment = -1;
   }
 
-  uint8_t interval_time = momentum_enabled()
-    ? match_momentum(1, 200)
-    : pgm_read_byte(&RGBLED_SNAKE_INTERVALS[interval / 2]);
+  uint8_t interval_time = 
+#ifdef VELOCIKEY_ENABLE
+    velocikey_enabled() ? velocikey_match_speed(1, 200) :
+#endif
+    pgm_read_byte(&RGBLED_SNAKE_INTERVALS[interval / 2]);
 
   if (timer_elapsed(last_timer) < interval_time) {
     return;
@@ -709,9 +720,11 @@ void rgblight_effect_snake(uint8_t interval) {
 void rgblight_effect_knight(uint8_t interval) {
   static uint16_t last_timer = 0;
 
-  uint8_t interval_time = momentum_enabled()
-    ? match_momentum(5, 100)
-    : pgm_read_byte(&RGBLED_KNIGHT_INTERVALS[interval]);
+  uint8_t interval_time = 
+#ifdef VELOCIKEY_ENABLE
+    velocikey_enabled() ? velocikey_match_speed(5, 100) :
+#endif
+    pgm_read_byte(&RGBLED_KNIGHT_INTERVALS[interval]);
 
   if (timer_elapsed(last_timer) < interval_time) {
     return;
@@ -795,6 +808,27 @@ void rgblight_effect_rgbtest(void) {
   }
   rgblight_setrgb(r, g, b);
   pos = (pos + 1) % 3;
+}
+
+void rgblight_effect_alternating(void){
+  static uint16_t last_timer = 0;
+  static uint16_t pos = 0;
+  if (timer_elapsed(last_timer) < 500) {
+    return;
+  }
+  last_timer = timer_read();
+
+  for(int i = 0; i<RGBLED_NUM; i++){
+		  if(i<RGBLED_NUM/2 && pos){
+			  rgblight_sethsv_at(rgblight_config.hue, rgblight_config.sat, rgblight_config.val, i);
+		  }else if (i>=RGBLED_NUM/2 && !pos){
+			  rgblight_sethsv_at(rgblight_config.hue, rgblight_config.sat, rgblight_config.val, i);
+		  }else{
+			  rgblight_sethsv_at(rgblight_config.hue, rgblight_config.sat, 0, i);
+		  }
+  }
+  rgblight_set();
+  pos = (pos + 1) % 2;
 }
 
 #endif /* RGBLIGHT_ANIMATIONS */

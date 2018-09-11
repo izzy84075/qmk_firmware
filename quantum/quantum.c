@@ -42,7 +42,7 @@ extern backlight_config_t backlight_config;
 #include "process_midi.h"
 #endif
 
-#include "momentum.h"
+#include "velocikey.h"
 
 #ifdef AUDIO_ENABLE
   #ifndef GOODBYE_SONG
@@ -149,8 +149,10 @@ void reset_keyboard(void) {
 #if defined(MIDI_ENABLE) && defined(MIDI_BASIC)
   process_midi_all_notes_off();
 #endif
-#if defined(AUDIO_ENABLE) && !defined(NO_MUSIC_MODE)
-  music_all_notes_off();
+#ifdef AUDIO_ENABLE
+  #ifndef NO_MUSIC_MODE
+    music_all_notes_off();
+  #endif
   uint16_t timer_start = timer_read();
   PLAY_SONG(goodbye_song);
   shutdown_user();
@@ -158,6 +160,7 @@ void reset_keyboard(void) {
     wait_ms(1);
   stop_all_notes();
 #else
+  shutdown_user();
   wait_ms(250);
 #endif
 // this is also done later in bootloader.c - not sure if it's neccesary here
@@ -195,7 +198,9 @@ bool process_record_quantum(keyrecord_t *record) {
   keypos_t key = record->event.key;
   uint16_t keycode;
 
-  if (momentum_enabled()) momentum_accelerate();
+#ifdef VELOCIKEY_ENABLE
+  if (velocikey_enabled()) velocikey_accelerate();
+#endif
 
   #if !defined(NO_ACTION_LAYER) && defined(PREVENT_STUCK_MODIFIERS)
     /* TODO: Use store_or_get_action() or a similar function. */
@@ -517,11 +522,13 @@ bool process_record_quantum(keyrecord_t *record) {
     }
     return false;
   #endif // defined(RGBLIGHT_ENABLE) || defined(RGB_MATRIX_ENABLE)
-  case MOM_TOG:
-    if (record->event.pressed) {
-      momentum_toggle();
-    }
-    return false;
+  #ifdef VELOCIKEY_ENABLE
+    case VLK_TOG:
+      if (record->event.pressed) {
+        velocikey_toggle();
+      }
+      return false;
+  #endif
   #ifdef PROTOCOL_LUFA
     case OUT_AUTO:
       if (record->event.pressed) {
@@ -940,7 +947,7 @@ uint8_t rgb_matrix_task_counter = 0;
 #endif
 
 void matrix_scan_quantum() {
-  #if defined(AUDIO_ENABLE)
+  #if defined(AUDIO_ENABLE) && !defined(NO_MUSIC_MODE)
     matrix_scan_music();
   #endif
 
