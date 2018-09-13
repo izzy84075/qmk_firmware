@@ -1115,7 +1115,8 @@ void backlight_task(void) {}
 
 static uint8_t breathing_period = BREATHING_PERIOD;
 static uint8_t breathing_halt = BREATHING_NO_HALT;
-static uint16_t breathing_counter = 0;
+static uint8_t breathing_index = 0;
+static uint8_t breathing_delay = 0;
 
 bool is_breathing(void) {
     return !!(TIMSK1 & _BV(TOIE1));
@@ -1123,12 +1124,13 @@ bool is_breathing(void) {
 
 #define breathing_interrupt_enable() do {TIMSK1 |= _BV(TOIE1);} while (0)
 #define breathing_interrupt_disable() do {TIMSK1 &= ~_BV(TOIE1);} while (0)
-#define breathing_min() do {breathing_counter = 0;} while (0)
-#define breathing_max() do {breathing_counter = breathing_period * 244 / 2;} while (0)
+#define breathing_min() do {breathing_index = 0;} while (0)
+#define breathing_max() do {breathing_index = breathing_period * 244 / 2;} while (0)
 
 void breathing_enable(void)
 {
-  breathing_counter = 0;
+  breathing_index = 0;
+  breathing_delay = 0;
   breathing_halt = BREATHING_NO_HALT;
   breathing_interrupt_enable();
 }
@@ -1201,23 +1203,26 @@ static inline uint16_t scale_backlight(uint16_t v) {
  */
 ISR(TIMER1_OVF_vect)
 {
-  uint16_t interval = 
+  uint16_t tempPeriod = (
 #ifdef VELOCIKEY_ENABLE
     velocikey_enabled() ? velocikey_match_speed(1, 10) : 
 #endif    
-    (uint16_t) breathing_period * 244 / BREATHING_STEPS;
+    (uint16_t) breathing_period) * 244 / BREATHING_STEPS;
 
   // resetting after one period to prevent ugly reset at overflow.
-  breathing_counter = (breathing_counter + 1) % (breathing_period * 244);
-  uint8_t index = breathing_counter / interval % BREATHING_STEPS;
+  breathing_delay += 1;
+  if(breathing_delay >= tempPeriod) {
+      breathing_index = (breathing_index + 1) % BREATHING_STEPS;
+      breathing_delay = 0;
+  }
 
-  if (((breathing_halt == BREATHING_HALT_ON) && (index == BREATHING_STEPS / 2)) ||
-      ((breathing_halt == BREATHING_HALT_OFF) && (index == BREATHING_STEPS - 1)))
+  if (((breathing_halt == BREATHING_HALT_ON) && (breathing_index == BREATHING_STEPS / 2)) ||
+      ((breathing_halt == BREATHING_HALT_OFF) && (breathing_index == BREATHING_STEPS - 1)))
   {
       breathing_interrupt_disable();
   }
 
-  set_pwm(cie_lightness(scale_backlight((uint16_t) pgm_read_byte(&breathing_table[index]) * 0x0101U)));
+  set_pwm(cie_lightness(scale_backlight((uint16_t) pgm_read_byte(&breathing_table[breathing_index]) * 0x0101U)));
 }
 
 #endif // BACKLIGHT_BREATHING
